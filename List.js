@@ -117,7 +117,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				// Doing this in postscript is a bit earlier than dijit would do it,
 				// but allows subclasses to access it pre-normalized during create.
 				this.srcNodeRef = srcNodeRef =
-					srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
+					srcNodeRef.nodeType ? srcNodeRef : this.getRowElementById(srcNodeRef);
 			}
 			this.create(params, srcNodeRef);
 		},
@@ -319,7 +319,11 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			}
 			return signal;
 		},
-		
+
+        getRowElementById: function(id) {
+            return byId(id);
+        },
+
 		cleanup: function(){
 			// summary:
 			//		Clears out all rows currently in the list.
@@ -328,7 +332,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				i;
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
-					var rowElement = byId(i);
+					var rowElement = this.getRowElementById(i);
 					if(rowElement){
 						this.removeRow(rowElement, true);
 					}
@@ -521,7 +525,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
 					((this.store && this.store.getIdentity) ? 
 						this.store.getIdentity(object) : this._autoId++),
-				row = byId(id),
+				row = this.getRowElementById(id),
 				previousRow = row && row.previousSibling;
 			
 			if(!row || // we must create a row if it doesn't exist, or if it previously belonged to a different container 
@@ -596,7 +600,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 				id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
-			return new this._Row(id, target, byId(this.id + "-row-" + id));
+			return new this._Row(id, target, this.getRowElementById(this.id + "-row-" + id));
 		},
 		cell: function(target){
 			// this doesn't do much in a plain list
