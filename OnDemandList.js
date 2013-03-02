@@ -97,6 +97,7 @@ return declare([List, _StoreMixin], {
 				next: preload,
 				options: options
 			};
+			topPreload.node.style.height = "0";
 			preload.node = preloadNode = put(this.contentNode, "div.dgrid-preload");
 			preload.previous = topPreload;
 		}
@@ -131,7 +132,14 @@ return declare([List, _StoreMixin], {
 			// Used as errback for when calls;
 			// remove the loadingNode and re-throw if an error was passed
 			put(loadingNode, "!");
-			if(err){ throw err; }
+			
+			if(err){
+				if(self._refreshDeferred){
+					self._refreshDeferred.reject(err);
+					delete self._refreshDeferred;
+				}
+				throw err;
+			}
 		}
 
 		// Establish query options, mixing in our own.
@@ -190,7 +198,7 @@ return declare([List, _StoreMixin], {
 				// resolve it now (_processScroll will remove it and resolve it itself
 				// otherwise)
 				if(self._refreshDeferred){
-					self._refreshDeferred.resolve({ results: results, rows: trs });
+					self._refreshDeferred.resolve(results);
 					delete self._refreshDeferred;
 				}
 				
@@ -238,7 +246,7 @@ return declare([List, _StoreMixin], {
 			// containing `results` (QueryResults) and `rows` (the rendered rows);
 			// externally the promise will resolve simply with the QueryResults, but
 			// the event will be emitted with both under respective properties.
-			return dfd.then(function(obj){
+			return dfd.then(function(results){
 				// Emit on a separate turn to enable event to be used consistently for
 				// initial render, regardless of whether the backing store is async
 				setTimeout(function() {
@@ -246,8 +254,7 @@ return declare([List, _StoreMixin], {
 						bubbles: true,
 						cancelable: false,
 						grid: self,
-						results: obj.results, // QueryResults object (may be a wrapped promise)
-						rows: obj.rows // array of rendered row elements
+						results: results // QueryResults object (may be a wrapped promise)
 					});
 				}, 0);
 				
@@ -255,7 +262,7 @@ return declare([List, _StoreMixin], {
 				delete self._refreshDeferred;
 				
 				// Resolve externally with just the QueryResults
-				return obj.results;
+				return results;
 			}, function(err){
 				delete self._refreshDeferred;
 				throw err;
@@ -533,8 +540,8 @@ return declare([List, _StoreMixin], {
 		// resolve the refresh promise based on the latest results obtained
 		if (lastRows && (refreshDfd = this._refreshDeferred)) {
 			delete this._refreshDeferred;
-			Deferred.when(lastRows, function(rows) {
-				refreshDfd.resolve({ results: lastResults, rows: rows });
+			Deferred.when(lastRows, function() {
+				refreshDfd.resolve(lastResults);
 			});
 		}
 	}

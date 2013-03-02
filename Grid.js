@@ -1,5 +1,5 @@
-define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "dojo/_base/sniff"],
-function(kernel, declare, listen, has, put, List){
+define(["dojo/_base/kernel", "dojo/_base/declare", "dojo/on", "dojo/has", "put-selector/put", "./List", "./util/misc", "dojo/_base/sniff"],
+function(kernel, declare, listen, has, put, List, miscUtil){
 	var contentBoxSizing = has("ie") < 8 && !has("quirks");
 	var invalidClassChars = /[^\._a-zA-Z0-9-]/g;
 	function appendIfNode(parent, subNode){
@@ -31,7 +31,7 @@ function(kernel, declare, listen, has, put, List){
 			// summary:
 			//		Get the cell object by node, or event, id, plus a columnId
 			
-			if(target.row && target.row instanceof this._Row){ return target; }
+			if("row" in target && target.column){ return target; }
 			
 			if(target.target && target.target.nodeType){
 				// event
