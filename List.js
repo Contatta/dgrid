@@ -98,6 +98,10 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 		//		when the list is destroyed.  Note this is effective at the time of
 		//		the call to addCssRule, not at the time of destruction.
 		cleanAddedRules: true,
+
+		// autoLoad: Boolean
+		//		Whether to load the list immediately on startup, or not.
+		autoLoad: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -231,7 +235,7 @@ function(kernel, declare, listen, has, miscUtil, TouchScroll, hasClass, put){
 			this._started = true;
 			this.resize();
 			// apply sort (and refresh) now that we're ready to render
-			this.set("sort", this._sort);
+			if(this.autoLoad){ this.set("sort", this._sort); }
 		},
 		
 		configStructure: function(){
