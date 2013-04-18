@@ -158,7 +158,7 @@ return declare([List, _StoreMixin], {
 		
 		// Render the result set
 		Deferred.when(self.renderArray(results, preloadNode, options), function(trs){
-			return Deferred.when(results.total || results.length, function(total){
+			return Deferred.when('total' in results ? results.total : results.length, function(total){
 				// remove loading node
 				put(loadingNode, "!");
 				// now we need to adjust the height and total count based on the first result set
