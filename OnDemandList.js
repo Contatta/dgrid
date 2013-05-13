@@ -163,7 +163,7 @@ return declare([List, _StoreMixin], {
 				put(loadingNode, "!");
 				// now we need to adjust the height and total count based on the first result set
 				var trCount = trs.length;
-				if(total === 0){
+				if(total === 0 && !self.noDataNode){
 					self.noDataNode = put(self.contentNode, "div.dgrid-no-data");
 					self.noDataNode.innerHTML = self.noDataMessage;
 				}
