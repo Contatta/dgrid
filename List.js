@@ -134,6 +134,8 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		//		The amount of time (in milliseconds) that a row should remain
 		//		highlighted after it has been updated.
 		highlightDuration: 250,
+
+        _byId: byId,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -153,7 +155,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				// Doing this in postscript is a bit earlier than dijit would do it,
 				// but allows subclasses to access it pre-normalized during create.
 				this.srcNodeRef = srcNodeRef =
-					srcNodeRef.nodeType ? srcNodeRef : byId(srcNodeRef);
+					srcNodeRef.nodeType ? srcNodeRef : this._byId(srcNodeRef);
 			}
 			this.create(params, srcNodeRef);
 		},
@@ -375,7 +377,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				i;
 			for(i in this._rowIdToObject){
 				if(this._rowIdToObject[i] != this.columns){
-					var rowElement = byId(i);
+					var rowElement = this._byId(i);
 					if(rowElement){
 						this.removeRow(rowElement, true);
 					}
@@ -530,7 +532,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 							advanceNext();
 						}
 						if(nextNode && !nextNode.parentNode){
-							nextNode = byId(nextNode.id);
+							nextNode = self._byId(nextNode.id);
 						}
 						parentNode = (beforeNode && beforeNode.parentNode) ||
 							(nextNode && nextNode.parentNode) || self.contentNode;
@@ -608,7 +610,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			function correctElement(row){
 				// If a node has been orphaned, try to retrieve the correct in-document element
 				// (use isDescendant since offsetParent is faulty in IE<9)
-				if(!dom.isDescendant(row, self.domNode) && byId(row.id)){
+				if(!dom.isDescendant(row, self.domNode) && self._byId(row.id)){
 					return self.row(row.id.slice(self.id.length + 5)).element;
 				}
 				// Fall back to the originally-specified element
@@ -702,7 +704,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				id = this.id + "-row-" + (parentId ? parentId + "-" : "") + 
 					((this.store && this.store.getIdentity) ? 
 						this.store.getIdentity(object) : this._autoId++),
-				row = byId(id),
+				row = this._byId(id),
 				previousRow = row && row.previousSibling;
 			
 			if(row){// if it existed elsewhere in the DOM, we will remove it, so we can recreate it
@@ -777,7 +779,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 				id = target;
 				target = this._rowIdToObject[this.id + "-row-" + id];
 			}
-			return new this._Row(id, target, byId(this.id + "-row-" + id));
+			return new this._Row(id, target, this._byId(this.id + "-row-" + id));
 		},
 		cell: function(target){
 			// this doesn't do much in a plain list
