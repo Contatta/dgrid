@@ -134,6 +134,10 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 		//		The amount of time (in milliseconds) that a row should remain
 		//		highlighted after it has been updated.
 		highlightDuration: 250,
+
+        // refreshOnStartup: Boolean
+        //      Whether to refresh immediately on startup.
+        refreshOnStartup: true,
 		
 		postscript: function(params, srcNodeRef){
 			// perform setup and invoke create in postScript to allow descendants to
@@ -278,7 +282,7 @@ function(kernel, declare, dom, listen, has, miscUtil, TouchScroll, hasClass, put
 			this._started = true;
 			this.resize();
 			// apply sort (and refresh) now that we're ready to render
-			this.set("sort", this._sort);
+			if (this.refreshOnStartup) this.set("sort", this._sort);
 		},
 		
 		configStructure: function(){
